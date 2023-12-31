@@ -1,71 +1,142 @@
 from pydub import AudioSegment
-import threading
-import os
-from pydub.playback import play
-import simpleaudio
-from simpleaudio import PlayObject
-from pydub.silence import split_on_silence, detect_silence
-from pydub import AudioSegment, effects
-import wave
 import numpy as np
+#
+from enum import Enum
+import pyaudio
 
-
-class Track:
-    def __init__(self, name: str, path: str, audio: AudioSegment):
-        self.name = name
-        self.path = path
-        self.audio = audio
-
-
-class Player:
-    pass
+from player.track import Track
 
 
 class Player:
-    tracks: list[Track] = []
-    playback: PlayObject
+    cross_fade_length = 3000
+    """ Cross fade length in ms """
 
-    def load_from_folder(self, path: str):
-        os.path.isdir(path)
-        # iterate over files in
-        # that directory
-        for filename in os.listdir(path):
-            f = os.path.join(path, filename)
-            # checking if it is a file
-            if os.path.isfile(f):
-                self.load(f)
+    class PlaybackStatus(Enum):
+        PLAY = 1
+        PAUSE = 2
 
-    def load(self, path: str):
-        audio: AudioSegment = AudioSegment.from_file(path, path.split(".")[-1])
-        effects.normalize(audio)
-        # remove silence at start and the end
-        silence = detect_silence(
-            audio,
-            min_silence_len=100,
-            silence_thresh=-35,
-        )
-        if len(silence) > 1:
-            # remove at start
-            audio = audio[silence[0][1]:silence[-1][0]]
-            print("from:", silence[0][1], "to:", silence[-1][0])
-            print("len:", len(audio))
-        if len(silence) == 1:
-            # remove at start
-            audio = audio[silence[0][1]:]
-            print("from:", silence[0][1], "to:", "end")
-            print("len:", len(audio))
+    current_track: Track | None = None
+    next_track: Track | None = None
 
-        track = Track(path.split("/")[-1], path, audio)
-        self.tracks.append(track)
+    playback: pyaudio.PyAudio
+    playback_stream: pyaudio.Stream = None
+    # Stuff for playback
+    playback_current_frame_count: int = 0
+    playback_next_frame_count: int = 0
 
-    def start_play(self):
-        track = self.tracks[0]
+    playback_fade: float = 0
+    """0 - current track plays\n
+       1 - next track plays"""
 
-        fade_track = self.tracks[0].audio.append(self.tracks[1].audio, crossfade=1500)
+    playback_frame_len: int = 96 * 4
+    playback_level: float = 0
 
-        self.playback = simpleaudio.play_buffer(
-            fade_track.raw_data,
-            num_channels=track.audio.channels,
-            bytes_per_sample=track.audio.sample_width,
-            sample_rate=track.audio.frame_rate
-        )
+    playback_status: PlaybackStatus = PlaybackStatus.PLAY
+    playback_pause_frame_count: int = 0
+
+    def _playback_stream_callback(self, in_data, frame_count, time_info, status):
+        """ This method is called when output stream requires some data, aka main audio loop """
+        # play status handling
+        match self.playback_status:
+            case self.PlaybackStatus.PLAY:
+                if self.playback_level < 1:
+                    self.playback_level += 0.005
+                else:
+                    self.playback_level = 1
+            case self.PlaybackStatus.PAUSE:
+                if self.playback_level > 0:
+                    self.playback_level -= 0.01 * self.playback_level ** 0.5
+                else:
+                    self.playback_level = 0
+        # end stream if nothing to play
+        if self.current_track is None:
+            return bytes([1]), pyaudio.paComplete
+
+        # stop playback when music is fully paused
+        if self.playback_level == 0:
+            return bytes([1]), pyaudio.paComplete
+
+        # check if fade is required
+        next_data = None
+        if (1000 * ((self.current_track.audio.frame_count() - self.playback_current_frame_count)
+                    / self.current_track.audio.frame_rate)) <= self.cross_fade_length:
+            if self.next_track is not None:
+                # get next track frame data
+                start_next = self.playback_next_frame_count * self.next_track.audio.frame_width
+                end_next = (self.playback_next_frame_count + frame_count) * self.next_track.audio.frame_width
+                next_data = self.next_track.audio.raw_data[start_next:end_next]
+                self.playback_next_frame_count += frame_count
+            else:
+                # or stop if no next track
+                self.playback_status = self.PlaybackStatus.PAUSE
+
+        # get current track frame data
+        start = self.playback_current_frame_count * self.current_track.audio.frame_width
+        end = (self.playback_current_frame_count + frame_count) * self.current_track.audio.frame_width
+        data = self.current_track.audio.raw_data[start:end]
+        self.playback_current_frame_count += frame_count
+
+        # do some fast multiplication
+        dtype = "int16"
+        data = np.frombuffer(data, dtype=dtype)
+
+        if next_data is not None:
+            next_data = np.frombuffer(next_data, dtype=dtype)
+            # fade between current and next data frame
+            data = (data * (1 - self.playback_fade)) + (next_data * self.playback_fade)
+            # calculate fade speed based on fade length, frame rate and frames per call (frame_count)
+            self.playback_fade += \
+                1 / (((self.current_track.audio.frame_rate * (self.cross_fade_length / 1000))
+                      - frame_count * 2) / frame_count)
+            # fade ended,move next track to current
+            if self.playback_fade > 1:
+                self.current_track = self.next_track
+                self.next_track = None
+                self.playback_current_frame_count = self.playback_next_frame_count
+                self.playback_fade = 0
+
+        data = data * self.playback_level
+        data = bytes(data.astype(dtype))
+
+        return data, pyaudio.paContinue
+
+    def init_player(self):
+        """ Initializes player, must be called before any other function! """
+        self.playback = pyaudio.PyAudio()
+
+    def _start_playback_stream(self):
+        def _callback(in_data, frame_count, time_info, status):
+            return self._playback_stream_callback(in_data, frame_count, time_info, status)
+
+        self.playback_stream = self.playback.open(
+            format=self.playback.get_format_from_width(self.current_track.audio.sample_width),
+            channels=self.current_track.audio.channels,
+            rate=self.current_track.audio.frame_rate,
+            output=True,
+            frames_per_buffer=self.playback_frame_len,
+            stream_callback=_callback)
+
+    # API
+
+    def play(self):
+        """ Will start playing current track """
+        self.playback_status = self.PlaybackStatus.PLAY
+        self.playback_current_frame_count = self.playback_pause_frame_count
+        if self.playback_stream is None or not self.playback_stream.is_active():
+            self._start_playback_stream()
+
+    def pause(self):
+        """ Will pause current track """
+        self.playback_status = self.PlaybackStatus.PAUSE
+        self.playback_pause_frame_count = self.playback_current_frame_count
+
+    def set_next(self, track: Track):
+        """" Will set next track to play """
+        # fade music in
+        if self.current_track is None:
+            self.current_track = track
+            self.playback_level = 0
+            self.playback_status = self.PlaybackStatus.PLAY
+        else:
+            self.next_track = track
+        pass
