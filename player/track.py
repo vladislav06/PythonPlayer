@@ -1,7 +1,7 @@
 from pydub import AudioSegment
 
 
-class Track:
+class Track(object):
     status: int = 0
 
     def __init__(self, name: str, path: str, audio: AudioSegment):
