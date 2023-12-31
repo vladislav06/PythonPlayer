@@ -1,5 +1,5 @@
 import time
-from multiprocessing import Queue
+from multiprocessing.connection import Connection
 
 from player.player import Player
 from player.track import Track
@@ -25,18 +25,27 @@ class NextMessage(Message):
         self.track = track
 
 
-def launch_player(queue: Queue):
+class TrackMessage(Message):
+    ID: int = 4
+    track: Track = None
+
+    def __init__(self, track: Track):
+        self.track = track
+
+
+def launch_player(pipe: Connection):
     player = Player()
     player.init_player()
-    # player.load_from_folder("./music/")
-    # player.start_play()
 
     while True:
-        message = queue.get()
-        if message.ID == PlayMessage.ID:
-            player.play()
-        elif message.ID == PauseMessage.ID:
-            player.pause()
-        elif message.ID == NextMessage.ID:
-            player.set_next(message.track)
+        if pipe.poll():
+            message = pipe.recv()
+            if message.ID == PlayMessage.ID:
+                player.play()
+            elif message.ID == PauseMessage.ID:
+                player.pause()
+            elif message.ID == NextMessage.ID:
+                player.set_next(message.track)
+        if player.current_track is not None:
+            pipe.send(TrackMessage(player.current_track.copy()))
         time.sleep(0.1)

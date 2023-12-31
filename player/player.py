@@ -97,7 +97,7 @@ class Player:
 
         data = data * self.playback_level
         data = bytes(data.astype(dtype))
-
+        self.current_track.status = self.playback_current_frame_count
         return data, pyaudio.paContinue
 
     def init_player(self):
