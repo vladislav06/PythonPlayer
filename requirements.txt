@@ -1,0 +1,6 @@
+pyedifice==0.3.0
+numpy==1.26.2
+pydub==0.25.1
+simpleaudio==1.0.4
+pyaudio
+jsonpickle
