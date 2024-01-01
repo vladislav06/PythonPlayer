@@ -3,6 +3,7 @@ import os
 from player.track import Track
 from pydub import AudioSegment, effects
 from pydub.silence import split_on_silence, detect_silence
+from pythonlangutil.overload import Overload, signature
 
 
 class SongManager:
@@ -18,8 +19,7 @@ class SongManager:
             if os.path.isfile(f):
                 self.load(f)
 
-    def load(self, path: str):
-        audio: AudioSegment = AudioSegment.from_file(path, path.split(".")[-1])
+    def _process_audio(self, audio: AudioSegment) -> AudioSegment:
         effects.normalize(audio)
         # remove silence at start and the end
         silence = detect_silence(
@@ -38,5 +38,23 @@ class SongManager:
             print("from:", silence[0][1], "to:", "end")
             print("len:", len(audio))
 
-        track = Track(path.split("/")[-1], path, audio)
+        return audio
+
+    @Overload
+    @signature("str")
+    def load(self, path: str):
+        audio: AudioSegment = AudioSegment.from_file(path, path.split(".")[-1])
+        track: Track = Track(path.split("/")[-1], path, audio)
         self.tracks.append(track)
+
+    @load.overload
+    @signature("Track")
+    def load(self, track: Track):
+        audio: AudioSegment = AudioSegment.from_file(os.path.join(track.path, track.name), track.name.split('.')[-1])
+        audio = self._process_audio(audio)
+        track.audio = audio
+        self.tracks.append(track)
+
+    @staticmethod
+    def check_existence(track: Track) -> bool:
+        return os.path.isfile(os.path.join(track.path, track.name))

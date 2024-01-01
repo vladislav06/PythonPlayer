@@ -25,6 +25,10 @@ class NextMessage(Message):
         self.track = track
 
 
+class PlayNextMessage(Message):
+    ID: int = 4
+
+
 class TrackMessage(Message):
     ID: int = 4
     track: Track = None
@@ -46,6 +50,9 @@ def launch_player(pipe: Connection):
                 player.pause()
             elif message.ID == NextMessage.ID:
                 player.set_next(message.track)
+            elif message.ID == PlayNextMessage.ID:
+                player.play_next()
+
         if player.current_track is not None:
             pipe.send(TrackMessage(player.current_track.copy()))
         time.sleep(0.1)

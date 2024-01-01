@@ -2,14 +2,40 @@ import json
 
 import jsonpickle
 
+from player.track import Track
 from playlists.playlist import Playlist
+from playlists.song_manager import SongManager
 
 
 class PlaylistManager:
     playlists: [Playlist] = []
 
+    FILE_NAME: str = "playlists.json"
+
     def save_playlists(self):
-        f = open("playlists.json", "w")
-        f.write(jsonpickle.encode(self.playlists, unpicklable=False))
+        """ Will save playlists to a file"""
+        f = open(self.FILE_NAME, "w")
+        jsn = map(lambda x: x.to_json(), self.playlists)
+        json.dump(list(jsn), f)
         f.flush()
         f.close()
+
+    def load_playlists(self) -> [Playlist]:
+        """ Will load playlists from a file and will check if tracks exist.
+        Will return list of Playlists with tracks that don't exist"""
+        f = open(self.FILE_NAME, "r")
+        jsn = json.load(f)
+        self.playlists = list(map(lambda x: Playlist.from_json(x), jsn))
+        f.close()
+
+        # check if track exist
+        playlists: [Playlist] = []
+        for playlist in self.playlists:
+            pl: [Playlist] = Playlist(playlist.name, [])
+            for track in playlist.tracks:
+                if not SongManager.check_existence(track):
+                    pl.tracks.append(track)
+            if len(pl.tracks) != 0:
+                playlists.append(pl)
+
+        return playlists

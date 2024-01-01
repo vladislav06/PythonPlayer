@@ -34,6 +34,8 @@ class Player:
     playback_status: PlaybackStatus = PlaybackStatus.PLAY
     playback_pause_frame_count: int = 0
 
+    play_next_track: bool = False
+
     def _playback_stream_callback(self, in_data, frame_count, time_info, status):
         """ This method is called when output stream requires some data, aka main audio loop """
         # play status handling
@@ -59,7 +61,7 @@ class Player:
         # check if fade is required
         next_data = None
         if (1000 * ((self.current_track.audio.frame_count() - self.playback_current_frame_count)
-                    / self.current_track.audio.frame_rate)) <= self.cross_fade_length:
+                    / self.current_track.audio.frame_rate)) <= self.cross_fade_length or self.play_next_track:
             if self.next_track is not None:
                 # get next track frame data
                 start_next = self.playback_next_frame_count * self.next_track.audio.frame_width
@@ -90,6 +92,7 @@ class Player:
                       - frame_count * 2) / frame_count)
             # fade ended,move next track to current
             if self.playback_fade > 1:
+                self.play_next_track = False
                 self.current_track = self.next_track
                 self.next_track = None
                 self.playback_current_frame_count = self.playback_next_frame_count
@@ -115,6 +118,7 @@ class Player:
             output=True,
             frames_per_buffer=self.playback_frame_len,
             stream_callback=_callback)
+        self.playback_stream.start_stream()
 
     # API
 
@@ -140,3 +144,6 @@ class Player:
         else:
             self.next_track = track
         pass
+
+    def play_next(self):
+        self.play_next_track = True

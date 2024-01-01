@@ -1,0 +1,36 @@
+[
+  {
+    "name": "playlist1",
+    "tracks": [
+      {
+        "name": "Com Truise - Cyanide Sisters.mp3",
+        "path": "./music"
+      },
+      {
+        "name": "tropical-summer-music-112842-[AudioTrimmer.com].mp3",
+        "path": "./music"
+      },
+      {
+        "name": "Tom Cruise - Cyanide Sisters.mp3",
+        "path": "./music"
+      }
+    ]
+  },
+  {
+    "name": "playlist2",
+    "tracks": [
+      {
+        "name": "tropical-summer-music-112842-[AudioTrimmer.com].mp3",
+        "path": "./music"
+      },
+      {
+        "name": "Com Truise - Cyanide Sisters.mp3",
+        "path": "./music"
+      },
+      {
+        "name": "tropical-sumer-music-112842-[AudioTrimmer.com].mp3",
+        "path": "./music"
+      }
+    ]
+  }
+]
