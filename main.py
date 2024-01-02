@@ -1,12 +1,21 @@
 from multiprocessing import set_start_method
 
 from player.player_interface import *
+from playlists.playlist import Playlist
 from player.player_manager import PlayerManager
 from playlists.playlist_manager import PlaylistManager
 from playlists.song_manager import SongManager
+from ui import ui
 
 
 def main():
+    playlist_manager: PlaylistManager = PlaylistManager()
+    playlist_manager.playlists.append(
+        Playlist("aboba1", [Track("adidas1", "some path"), Track("adidas2", "some path")]))
+    playlist_manager.playlists.append(
+        Playlist("aboba2", [Track("adidas1", "some path"), Track("adidas2", "some path")]))
+    ui.launch(playlist_manager.playlists)
+'''
     # load playlists
     playlist_manager: PlaylistManager = PlaylistManager()
     playlists = playlist_manager.load_playlists()
@@ -38,9 +47,10 @@ def main():
         if track is not None:
             print(track.status)
             2 + 2;
+            '''
 
 
-# ui.launch()
+
 
 
 if __name__ == "__main__":

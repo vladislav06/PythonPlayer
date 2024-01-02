@@ -4,15 +4,15 @@
     "tracks": [
       {
         "name": "Com Truise - Cyanide Sisters.mp3",
-        "path": "./music"
+        "path": "E:\\PythonPlayer\\music"
       },
       {
         "name": "tropical-summer-music-112842-[AudioTrimmer.com].mp3",
-        "path": "./music"
+        "path": "E:\\PythonPlayer\\music"
       },
       {
         "name": "Tom Cruise - Cyanide Sisters.mp3",
-        "path": "./music"
+        "path": "E:\\PythonPlayer\\music"
       }
     ]
   },
@@ -21,15 +21,15 @@
     "tracks": [
       {
         "name": "tropical-summer-music-112842-[AudioTrimmer.com].mp3",
-        "path": "./music"
+        "path": "E:\\PythonPlayer\\music"
       },
       {
         "name": "Com Truise - Cyanide Sisters.mp3",
-        "path": "./music"
+        "path": "E:\\PythonPlayer\\music"
       },
       {
         "name": "tropical-sumer-music-112842-[AudioTrimmer.com].mp3",
-        "path": "./music"
+        "path": "E:\\PythonPlayer\\music"
       }
     ]
   }

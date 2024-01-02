@@ -1,10 +1,13 @@
 from edifice import component, View, Label, ScrollView
+from player.track import Track
+from ui.widgets import track as trWidget
+from playlists.playlist import Playlist
 
-tracks = ["1", "12", "2", "3", "4"]
+testTracks = ["1", "12", "2", "3", "4"]
 
 
 @component
-def Tracks(self):
+def ShowTracks(self, playlistTracks):
     with ScrollView(layout="column"):
-        for item in tracks:
-            Label(item)
+        for track in playlistTracks:
+            trWidget.ShowTrack(track)

@@ -6,14 +6,14 @@ import ui.tracks as tk
 
 
 @component
-def MyApp(self):
+def MyApp(self, playlists):
     with Window():  # Top of every App must be a Window
         with View(layout="row"):  # Top Window must have one static child
-            pl.Playlists()
-            tk.Tracks()
+            pl.Playlists(playlists)
+            tk.ShowTracks(playlists[0].tracks)
 
 
 
 
-def launch():
-    App(MyApp()).start()
+def launch(playlists):
+    App(MyApp(playlists)).start()

@@ -1,10 +1,12 @@
 from edifice import component, View, Label, ScrollView
+from ui.widgets import playlist as plWidget
 
-playlists = ["1", "12", "2", "3", "4"]
+#testPlaylists = ["1", "12", "2", "3", "4"]
 
 
 @component
-def Playlists(self):
+def Playlists(self, playlists):
     with ScrollView(layout="column"):
-        for item in playlists:
-            Label(item)
+        for playlist in playlists:
+            #Label(item)
+            plWidget.ShowPlaylist(playlist)
