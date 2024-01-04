@@ -11,10 +11,11 @@ from ui import ui
 def main():
     playlist_manager: PlaylistManager = PlaylistManager()
     playlist_manager.playlists.append(
-        Playlist("aboba1", [Track("adidas1", "some path"), Track("adidas2", "some path")]))
+        Playlist("adidas", [Track("adidas1", "some path"), Track("adidas2", "some path")]))
     playlist_manager.playlists.append(
-        Playlist("aboba2", [Track("nike1", "some path"), Track("nike2", "some path")]))
-    ui.launch(playlist_manager.playlists)
+        Playlist("nike", [Track("nike1", "some path"), Track("nike2", "some path")]))
+    ui.launch(playlist_manager)
+
 '''
     # load playlists
     playlist_manager: PlaylistManager = PlaylistManager()
@@ -48,10 +49,6 @@ def main():
             print(track.status)
             2 + 2;
             '''
-
-
-
-
 
 if __name__ == "__main__":
     set_start_method('spawn')
