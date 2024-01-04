@@ -18,9 +18,9 @@ playlistsTest = playlist_manager.playlists
 '''
 
 # Styles for playlists
-playlist_regular_style = {"width": 170, "align": "left",
+playlist_regular_style = {"align": "left",
                           "padding": 25, "font-size": 20}
-playlist_chosen_style = {"width": 170, "align": "left", "font-style": "italic",
+playlist_chosen_style = {"align": "left", "font-style": "italic",
                          "padding": 25, "text-decoration": "underline", "font-size": 20}
 # Styles for icons
 icon_style = {"width": 10, "padding": 10}
@@ -36,8 +36,7 @@ def playlist(self, plst, playlist_notifier):
         with ButtonView(
                 layout="row",
                 style={"background-color": "#32a852", "border-radius": 25},
-                on_click=on_click,
-        ):
+                on_click=on_click):
             Icon(name="music", style=icon_style)
             Label(text=plst.name, style=playlist_regular_style)
 

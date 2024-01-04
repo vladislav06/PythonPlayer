@@ -53,6 +53,7 @@ class SongManager:
         audio: AudioSegment = AudioSegment.from_file(os.path.join(track.path, track.name), track.name.split('.')[-1])
         audio = self._process_audio(audio)
         track.audio = audio
+        track.max_status = track.audio.frame_count()
         self.tracks.append(track)
 
     @staticmethod

@@ -16,7 +16,7 @@ def Playlists(self, playlists: [Playlist], playlist_notifier):
 
     playlist_notifier.attach(on_change)
 
-    with ScrollView(layout="column"):
+    with ScrollView(layout="column", style={"min-width": "250px", "max-width": "250px"}):
         for playlist in playlists:
             if playlist == playlist_notifier.value:
                 plWidget.selected_playlist(playlist, playlist_notifier)

@@ -9,14 +9,6 @@ from ui import ui
 
 
 def main():
-    playlist_manager: PlaylistManager = PlaylistManager()
-    playlist_manager.playlists.append(
-        Playlist("adidas", [Track("adidas1", "some path"), Track("adidas2", "some path")]))
-    playlist_manager.playlists.append(
-        Playlist("nike", [Track("nike1", "some path"), Track("nike2", "some path")]))
-    ui.launch(playlist_manager)
-
-'''
     # load playlists
     playlist_manager: PlaylistManager = PlaylistManager()
     playlists = playlist_manager.load_playlists()
@@ -37,18 +29,16 @@ def main():
     # launch player in another thread
     # pipe for bidirectional communication with player
     player_manager = PlayerManager()
-    player_manager.launch_player()
 
+    player_manager.launch_player()
+    '''
     player_manager.set_next_track(song_manager.tracks[1])
     player_manager.play()
     player_manager.set_next_track(song_manager.tracks[0])
-    player_manager.play_next()
-    while True:
-        track = player_manager.get_status()
-        if track is not None:
-            print(track.status)
-            2 + 2;
-            '''
+    player_manager.play_next()'''
+
+    ui.launch(playlist_manager,player_manager)
+
 
 if __name__ == "__main__":
     set_start_method('spawn')

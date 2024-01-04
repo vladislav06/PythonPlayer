@@ -5,9 +5,11 @@ from util.serializable import Serializable
 
 class Track(Serializable):
     status: int = 0
+    max_status = 1
     name: str = ""
     path: str = ""
     audio: AudioSegment | None = None
+    index: int = 0
 
     def __init__(self, name: str, path: str, audio: AudioSegment | None = None):
         self.name = name

@@ -26,6 +26,10 @@ class PlaylistManager:
         f = open(self.FILE_NAME, "r")
         jsn = json.load(f)
         self.playlists = list(map(lambda x: Playlist.from_json(x), jsn))
+        n = 0
+        for playlist in self.playlists:
+            playlist.index = n
+            n += 1
         f.close()
 
         # check if track exist
