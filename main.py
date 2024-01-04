@@ -13,7 +13,7 @@ def main():
     playlist_manager.playlists.append(
         Playlist("aboba1", [Track("adidas1", "some path"), Track("adidas2", "some path")]))
     playlist_manager.playlists.append(
-        Playlist("aboba2", [Track("adidas1", "some path"), Track("adidas2", "some path")]))
+        Playlist("aboba2", [Track("nike1", "some path"), Track("nike2", "some path")]))
     ui.launch(playlist_manager.playlists)
 '''
     # load playlists
