@@ -7,3 +7,4 @@ jsonpickle
 pythonlangutil
 typing-extensions
 PySide6
+tinytag

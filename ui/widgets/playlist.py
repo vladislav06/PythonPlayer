@@ -23,9 +23,9 @@ playlistsTest = playlist_manager.playlists
 #playlists = playlist_manager.load_playlists()
 
 # Styles for playlists
-playlist_regular_style = {"width": 170, "align": "left",
+playlist_regular_style = {"align": "left", "height": 25,
                         "padding": 25, "font-size": 20}
-playlist_chosen_style = {"width": 170, "align": "left", "font-style": "italic",
+playlist_chosen_style = {"align": "left", "font-style": "italic", "height": 25,
                         "padding": 25, "text-decoration": "underline", "font-size": 20}
 # Styles for icons
 icon_style = {"width": 10, "padding": 10}

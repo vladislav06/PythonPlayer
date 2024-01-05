@@ -8,6 +8,7 @@ from playlists.playlist import Playlist
 
 @component
 def ShowTracks(self, playlistTracks):
-    with ScrollView(layout="column", style={"background-color": "#cccfdb", "margin": 10}):
+    with ScrollView(layout="column", style={"background-color": "#cccfdb", "margin": 10,
+                                            "min-width": "250px", "max-width": "250px"}):
         for track in playlistTracks:
             trWidget.ShowTrack(track)

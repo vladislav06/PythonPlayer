@@ -7,7 +7,7 @@ from ui.widgets import playlist as plWidget
 @component
 def Playlists(self, playlists, chosen_playlist):
     playlist_number = 0
-    with ScrollView(layout="column"):
+    with ScrollView(layout="column", style={"min-width": "250px", "max-width": "250px"}):
         for playlist in playlists:
             #Label(item)
             plWidget.ShowPlaylist(playlist, playlist_number, chosen_playlist)
