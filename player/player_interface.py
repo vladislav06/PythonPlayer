@@ -30,10 +30,10 @@ class PlayNextMessage(Message):
 
 
 class TrackMessage(Message):
-    ID: int = 4
+    ID: int = 5
     track: Track = None
 
-    def __init__(self, track: Track):
+    def __init__(self, track: Track = None):
         self.track = track
 
 
@@ -42,17 +42,23 @@ def launch_player(pipe: Connection):
     player.init_player()
 
     while True:
-        if pipe.poll():
-            message = pipe.recv()
-            if message.ID == PlayMessage.ID:
-                player.play()
-            elif message.ID == PauseMessage.ID:
-                player.pause()
-            elif message.ID == NextMessage.ID:
-                player.set_next(message.track)
-            elif message.ID == PlayNextMessage.ID:
-                player.play_next()
+        try:
+            if pipe.poll():
+                message = pipe.recv()
+                if message.ID == PlayMessage.ID:
+                    player.play()
+                elif message.ID == PauseMessage.ID:
+                    player.pause()
+                elif message.ID == NextMessage.ID:
+                    player.set_next(message.track)
+                elif message.ID == PlayNextMessage.ID:
+                    player.play_next()
+                elif message.ID == TrackMessage.ID:
+                    if player.current_track is not None:
+                        pipe.send(TrackMessage(player.current_track.copy()))
+                    else:
+                        pipe.send(TrackMessage())
 
-        if player.current_track is not None:
-            pipe.send(TrackMessage(player.current_track.copy()))
-        time.sleep(0.1)
+            time.sleep(0.1)
+        except Exception as e:
+            print(e)

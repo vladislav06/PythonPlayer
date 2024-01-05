@@ -6,6 +6,7 @@ from util.serializable import Serializable
 class Track(Serializable):
     status: int = 0
     max_status = 1
+    is_loaded: bool = False
     name: str = ""
     path: str = ""
     audio: AudioSegment | None = None
@@ -20,6 +21,10 @@ class Track(Serializable):
         """ Will return copy of this track, but without audio data"""
         track = Track(self.name, self.path)
         track.status = self.status
+        track.max_status = self.max_status
+        track.is_loaded = self.is_loaded
+        track.index = self.index
+
         return track
 
     def to_json(self):

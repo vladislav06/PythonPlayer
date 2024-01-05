@@ -54,6 +54,7 @@ class SongManager:
         audio = self._process_audio(audio)
         track.audio = audio
         track.max_status = track.audio.frame_count()
+        track.is_loaded = True
         self.tracks.append(track)
 
     @staticmethod

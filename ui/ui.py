@@ -10,18 +10,13 @@ from util.notifier import Notifier
 
 # Start the program as-is
 @component
-def MyApp(self, pl_manager: PlaylistManager, initial_playlist,player_manager):
-    playlist_notifier = Notifier()
-    playlist_notifier.value = initial_playlist
-    track_notifier = Notifier()
-    track_notifier.value = None
-
+def MyApp(self, pl_manager: PlaylistManager, player_control, playlist_notifier, track_notifier):
     with Window():  # Top of every App must be a Window
         with View(layout="row"):  # Top Window must have one static child
             pl.Playlists(pl_manager.playlists, playlist_notifier)
-            player(player_manager,playlist_notifier, track_notifier)
+            player(player_control, playlist_notifier, track_notifier)
             tk.ShowTracks(playlist_notifier)
 
 
-def launch(pl_manager: PlaylistManager,player_manager):
-    App(MyApp(pl_manager, pl_manager.playlists[0],player_manager)).start()
+def launch(pl_manager: PlaylistManager, player_control, playlist_notifier, track_notifier):
+    App(MyApp(pl_manager, player_control, playlist_notifier, track_notifier)).start()

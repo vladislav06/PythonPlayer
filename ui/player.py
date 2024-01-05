@@ -2,7 +2,7 @@ from datetime import datetime
 
 from edifice import component, View, Label, ScrollView, use_state, Image, ProgressBar, ButtonView, Icon
 
-from player.player_manager import PlayerManager
+from player.player_controll import PlayerControl
 from player.track import Track
 from playlists.playlist import Playlist
 from util.notifier import Notifier
@@ -11,36 +11,30 @@ icon_style = {"width": 10, "padding": 10}
 
 
 @component
-def player(self, player: PlayerManager, playlist_notifier: Notifier[Playlist], track_notifier: Notifier[Track]):
+def player(self, player_control: PlayerControl, playlist_notifier: Notifier[Playlist], track_notifier: Notifier[Track]):
+    progress, progress_setter = use_state(0.0)
+
+    def on_change(val):
+        progress_setter(0.5)
+
+    track_notifier.attach(on_change)
+    playlist_notifier.attach(on_change)
+
     progress = 0
     length = 0
-    if track_notifier.value is not None:
-        progress = track_notifier.value.status / track_notifier.value.max_status
+    if track_notifier.value is not None and track_notifier.value.is_loaded is True:
+        progress = player_control.get_progres()
+        print(progress)
         length = len(track_notifier.value.audio)
 
     def on_play_pause(e):
-        player.play()
+        player_control.play_pause()
 
     def on_forward(e):
-        next_index = track_notifier.value.index + 1
-        if next_index >= len(playlist_notifier.value.tracks):
-            next_index = 0
-        player.set_next_track(playlist_notifier.value.tracks[next_index])
-        player.play_next()
+        player_control.forward()
 
     def on_backward(e):
-        if progress < 0.2:
-            # play prev track
-            next_index = track_notifier.value.index - 1
-            if next_index < 0:
-                next_index = 0
-            player.set_next_track(playlist_notifier.value.tracks[next_index])
-            player.play_next()
-        else:
-            # switch to track start
-            track_notifier.value.status = 0
-            player.set_next_track(track_notifier.value)
-            player.play_next()
+        player_control.backward()
 
     with View(layout="column"):
         Image("./images/Daft_Punk-Discovery.png", style={"align": "center"})

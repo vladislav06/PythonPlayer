@@ -2,6 +2,8 @@ from multiprocessing import Process, set_start_method, Pipe
 
 from player.player_interface import *
 
+import time
+
 
 class PlayerManager:
     connection: Connection
@@ -24,8 +26,9 @@ class PlayerManager:
         self.connection.send(PlayNextMessage())
 
     def get_status(self) -> Track | None:
-        if self.connection.poll():
-            trck: TrackMessage = self.connection.recv()
-            return trck.track
-        else:
-            return None
+        self.connection.send(TrackMessage())
+        while not self.connection.poll():
+            time.sleep(0.1)
+
+        trck: TrackMessage = self.connection.recv()
+        return trck.track
