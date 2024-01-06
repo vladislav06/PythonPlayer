@@ -4,7 +4,7 @@ import jsonpickle
 
 from player.track import Track
 from playlists.playlist import Playlist
-from playlists.song_manager import SongManager
+from playlists.song_manager import TrackManager
 
 
 class PlaylistManager:
@@ -26,6 +26,10 @@ class PlaylistManager:
         f = open(self.FILE_NAME, "r")
         jsn = json.load(f)
         self.playlists = list(map(lambda x: Playlist.from_json(x), jsn))
+        n = 0
+        for playlist in self.playlists:
+            playlist.index = n
+            n += 1
         f.close()
 
         # check if track exist
@@ -33,7 +37,7 @@ class PlaylistManager:
         for playlist in self.playlists:
             pl: [Playlist] = Playlist(playlist.name, [])
             for track in playlist.tracks:
-                if not SongManager.check_existence(track):
+                if not TrackManager.check_existence(track):
                     pl.tracks.append(track)
             if len(pl.tracks) != 0:
                 playlists.append(pl)
