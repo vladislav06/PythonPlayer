@@ -20,4 +20,5 @@ def ShowTracks(self, playlist_notifier: Notifier[Playlist]):
     with ScrollView(layout="column",
                     style={"background-color": "#cccfdb", "margin": 10, "min-width": "250px", "max-width": "250px"}):
         for track in playlist_notifier.value.tracks:
+
             trWidget.ShowTrack(track)
