@@ -47,11 +47,13 @@ class TrackMessage(Message):
     next_status: int = 0
     current_track_exist: bool = False
     next_track_exist: bool = False
+    in_transition: bool = False
 
     def __init__(self, current_status,
                  next_status,
                  current_track_exist,
                  next_track_exist,
+                 in_transition,
                  current_track: Track = None,
                  next_track: Track = None):
         self.current_track = current_track
@@ -60,6 +62,7 @@ class TrackMessage(Message):
         self.next_status = next_status
         self.current_track_exist = current_track_exist
         self.next_track_exist = next_track_exist
+        self.in_transition = in_transition
 
 
 def loop(pipe: Connection, player):
@@ -84,9 +87,9 @@ def loop(pipe: Connection, player):
                                            player.next_track.status if player.next_track is not None else 0,
                                            player.current_track is not None,
                                            player.next_track is not None,
+                                           player.in_transition,
                                            player.current_track.copy() if player.current_track is not None else None,
                                            player.next_track.copy() if player.next_track is not None else None))
-
 
             time.sleep(0.1)
         except Exception as e:

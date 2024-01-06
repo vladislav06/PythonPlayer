@@ -38,6 +38,7 @@ class Player:
     playback_pause_frame_count: int = 0
 
     play_next_track: bool = False
+    in_transition: bool = False
 
     def _playback_stream_callback(self, in_data, frame_count, time_info, status):
         """ This method is called when output stream requires some data, aka main audio loop """
@@ -69,6 +70,7 @@ class Player:
             next_data = None
             if (1000 * ((self.current_track.audio.frame_count - self.playback_current_frame_count)
                         / self.current_track.audio.frame_rate)) <= self.cross_fade_length or self.play_next_track:
+                self.in_transition = True
                 # print("must fade, forced:", self.play_next_track)
                 if self.next_track is not None:
                     # get next track frame data
@@ -80,6 +82,8 @@ class Player:
                     # or next track is empty aray
                     next_data = np.zeros(frame_count * self.current_track.audio.frame_width)
                     self.playback_next_frame_count += frame_count
+            else:
+                self.in_transition = False
 
             # get current track frame data
             start = self.playback_current_frame_count * self.current_track.audio.frame_width

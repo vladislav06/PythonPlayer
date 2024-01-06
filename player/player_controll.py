@@ -15,6 +15,7 @@ class PlayerControl:
     track_notifier: Notifier[Track]
     track_status_notifier: Notifier[Track]
     track_full_status: TrackMessage
+    next_track: Track
 
     track_manager: TrackManager
     player: PlayerManager
@@ -54,6 +55,7 @@ class PlayerControl:
         if status.current_track_exist:
             print("current_track_exist")
             self.player.set_next_track(self.playlist_notifier.value.tracks[next_index])
+            self.next_track = self.playlist_notifier.value.tracks[next_index]
             if force:
                 self.track_notifier.value = self.playlist_notifier.value.tracks[next_index]
                 self.player.play_next()
@@ -82,6 +84,7 @@ class PlayerControl:
 
             if status.current_track_exist:
                 self.player.set_next_track(self.playlist_notifier.value.tracks[next_index])
+                self.next_track = self.playlist_notifier.value.tracks[next_index]
                 self.track_notifier.value = self.playlist_notifier.value.tracks[next_index]
                 self.player.play_next()
             else:
@@ -93,6 +96,7 @@ class PlayerControl:
 
             if status.current_track_exist:
                 self.player.set_next_track(self.track_notifier.value)
+                self.next_track = self.track_notifier.value
                 self.track_notifier.value = self.track_notifier.value
                 self.player.play_next()
             else:
@@ -103,6 +107,7 @@ class PlayerControl:
         # calculate new status from percentage
         self.track_notifier.value.status = int(new_status * self.track_notifier.value.max_status)
         self.player.set_next_track(self.track_notifier.value)
+        self.next_track = self.track_notifier.value
         self.track_notifier.value = self.track_notifier.value
         self.track_notifier.notify()
         self.player.play_next()
@@ -125,7 +130,11 @@ class PlayerControl:
         """This periodic function will update currently playing track status"""
         self.track_full_status = await self.player.get_status()
         self.track_status_notifier.value = self.track_full_status.current_track
+
+        if self.track_full_status.in_transition:
+            self.track_notifier.value = self.next_track
         # add next track
         if not self.track_full_status.next_track_exist:
             self.forward(force=False)
+
         await asyncio.sleep(0.5)

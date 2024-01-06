@@ -34,7 +34,7 @@ class PlayerManager:
         self.connection.send(PlayNextMessage())
 
     async def get_status(self) -> TrackMessage | None:
-        self.connection.send(TrackMessage(0, 0, False, False))
+        self.connection.send(TrackMessage(0, 0, False, False, False))
         while not self.connection.poll():
             await asyncio.sleep(0.2)
 
@@ -42,7 +42,7 @@ class PlayerManager:
         return trck
 
     def get_full_status(self) -> TrackMessage:
-        self.connection.send(TrackMessage(0, 0, False, False))
+        self.connection.send(TrackMessage(0, 0, False, False, False))
         trck: TrackMessage = self.connection.recv()
         return trck
         # return TrackMessage(0,0,False,False)
