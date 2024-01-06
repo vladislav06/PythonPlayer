@@ -5,3 +5,6 @@ simpleaudio==1.0.4
 pyaudio
 jsonpickle
 pythonlangutil
+typing-extensions
+PySide6
+tinytag
