@@ -1,6 +1,11 @@
 from edifice import component, View, Label, Button
 from tinytag import TinyTag
 
+# Styles
+track_style = {"height": 25, "margin": 10, "padding": 25,
+                   "border": "1px solid black"}
+button_style = {"height": 15, "width": 15, "font-size": 8}
+
 # At least on Windows, if a metadata field is empty, tinytag will always yield this string:
 empty_data_string = '                              '
 # It's used here to check whether certain metadata exists or not.
@@ -23,8 +28,6 @@ def ConvertToMinutes(seconds):
 def ShowTrack(self, track):
     # Get metadata from the track
     #track_metadata = TinyTag.get(track.path)
-    track_style = {"height": 25, "margin": 10, "padding": 25,
-                   "border": "1px solid black"}
     with View(layout="row", style=track_style, on_click=click):
         # Display for title-artist
         with View(layout="column", style={"align": "left"}):
@@ -45,6 +48,10 @@ def ShowTrack(self, track):
                 Label('-')
             '''
             Label('Very cool track')
+        # Display for buttons (move up or down)
+        with View(layout="column", style={"align": "right"}):
+            Button('▲', style=button_style)
+            Button('▼', style=button_style)
         # Display for length
         with View(style={"align": "right"}):
             Label('2:28')

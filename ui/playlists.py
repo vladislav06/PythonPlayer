@@ -1,4 +1,4 @@
-from edifice import component, View, Label, ScrollView
+from edifice import component, View, Label, ScrollView, Button
 from ui.widgets import playlist as plWidget
 
 #testPlaylists = ["1", "12", "2", "3", "4"]
@@ -12,3 +12,4 @@ def Playlists(self, playlists, chosen_playlist):
             #Label(item)
             plWidget.ShowPlaylist(playlist, playlist_number, chosen_playlist)
             playlist_number += 1
+
