@@ -1,4 +1,3 @@
-import asyncio
 from multiprocessing import set_start_method
 
 from player.player_controll import PlayerControl
@@ -6,7 +5,7 @@ from player.player_interface import *
 from playlists.playlist import Playlist
 from player.player_manager import PlayerManager
 from playlists.playlist_manager import PlaylistManager
-from playlists.song_manager import SongManager
+from playlists.song_manager import TrackManager
 from ui import ui
 from util.notifier import Notifier
 
@@ -27,9 +26,12 @@ def main():
     print("these tracks dont exist:", n)
     ###
     # load songs from 1st playlist
-    song_manager = SongManager()
-    song_manager.load(playlist_manager.playlists[0].tracks[0])
-    song_manager.load(playlist_manager.playlists[0].tracks[1])
+    song_manager = TrackManager()
+    #song_manager.load(playlist_manager.playlists[0].tracks[0])
+    #song_manager.load(playlist_manager.playlists[0].tracks[1])
+
+    for track in playlist_manager.playlists[0].tracks:
+        song_manager.load(track)
 
     player_manager = PlayerManager()
     player_manager.launch_player()
@@ -37,14 +39,16 @@ def main():
     playlist_notifier = Notifier()
     playlist_notifier.value = playlist_manager.playlists[0]
     track_notifier = Notifier()
+    track_status_notifier = Notifier()
+    track_notifier.value = song_manager.tracks[0]
+    player_control: PlayerControl = PlayerControl(player_manager, song_manager, playlist_notifier, track_notifier,
+                                                  track_status_notifier)
 
-    player_control: PlayerControl = PlayerControl(player_manager, song_manager, playlist_notifier, track_notifier)
-    player_control.init()
-
-    ui.launch(playlist_manager, player_control, playlist_notifier, track_notifier)
+    ui.launch(playlist_manager, player_control, playlist_notifier, track_notifier,track_status_notifier)
+    while True:
+        2 + 2
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
     set_start_method('spawn')
     main()

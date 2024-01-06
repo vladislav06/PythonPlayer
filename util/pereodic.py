@@ -5,7 +5,7 @@ import time
 class Periodic(object):
     def __init__(self, interval, callback):
         self.interval = interval
-
+        time.sleep(1)
         @functools.wraps(callback)
         def wrapper(*args, **kwargs):
             result = callback(*args, **kwargs)

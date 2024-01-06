@@ -1,6 +1,47 @@
-from pydub import AudioSegment
+import numpy
+import numpy as np
 
 from util.serializable import Serializable
+
+
+class Audio:
+    _data: np.ndarray
+    _frame_width = 4
+    _frame_rate = 0
+    _frame_count = 0
+    _channels = 2
+    _len_ms = 0
+
+    def __init__(self, data, frame_width, frame_rate, frame_count, channels):
+        self._data = data
+        self._frame_width = frame_width
+        self._frame_rate = frame_rate
+        self._frame_count = frame_count
+        self._channels = channels
+
+    @property
+    def raw_data(self) -> numpy.ndarray:
+        return self._data
+
+    @property
+    def frame_width(self):
+        return self._frame_width
+
+    @property
+    def frame_rate(self):
+        return self._frame_rate
+
+    @property
+    def frame_count(self):
+        return self._frame_count
+
+    @property
+    def channels(self):
+        return self._channels
+
+    @property
+    def len_ms(self):
+        return self._len_ms
 
 
 class Track(Serializable):
@@ -9,10 +50,10 @@ class Track(Serializable):
     is_loaded: bool = False
     name: str = ""
     path: str = ""
-    audio: AudioSegment | None = None
+    audio: Audio | None = None
     index: int = 0
 
-    def __init__(self, name: str, path: str, audio: AudioSegment | None = None):
+    def __init__(self, name: str, path: str, audio: Audio | None = None):
         self.name = name
         self.path = path
         self.audio = audio
