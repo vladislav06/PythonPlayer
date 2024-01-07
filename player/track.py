@@ -12,12 +12,13 @@ class Audio:
     _channels = 2
     _len_ms = 0
 
-    def __init__(self, data, frame_width, frame_rate, frame_count, channels):
+    def __init__(self, data, frame_width, frame_rate, frame_count, channels, len_ms):
         self._data = data
         self._frame_width = frame_width
         self._frame_rate = frame_rate
         self._frame_count = frame_count
         self._channels = channels
+        self._len_ms = len_ms
 
     @property
     def raw_data(self) -> numpy.ndarray:
@@ -52,6 +53,7 @@ class Track(Serializable):
     path: str = ""
     audio: Audio | None = None
     index: int = 0
+    exist: bool = False
 
     def __init__(self, name: str, path: str, audio: Audio | None = None):
         self.name = name

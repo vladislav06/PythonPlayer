@@ -38,7 +38,10 @@ class PlaylistManager:
             pl: [Playlist] = Playlist(playlist.name, [])
             for track in playlist.tracks:
                 if not TrackManager.check_existence(track):
+                    track.exist = False
                     pl.tracks.append(track)
+                else:
+                    track.exist = True
             if len(pl.tracks) != 0:
                 playlists.append(pl)
 

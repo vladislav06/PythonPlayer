@@ -30,6 +30,7 @@ icon_style = {"width": 10, "padding": 10}
 @component
 def playlist(self, plst, playlist_notifier):
     def on_click(e):
+        print("click on playlist:", plst.name)
         playlist_notifier.value = plst
 
     # Set background
@@ -45,6 +46,7 @@ def playlist(self, plst, playlist_notifier):
 @component
 def selected_playlist(self, plst, playlist_notifier):
     def click(e):
+        print("click on selected_playlist:", plst.name)
         playlist_notifier.value = plst
 
     # Set background

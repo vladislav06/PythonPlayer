@@ -52,9 +52,11 @@ class TrackManager:
     @load.overload
     @signature("Track")
     def load(self, track: Track):
+        if not track.exist:
+            return
         au: AudioSegment = AudioSegment.from_file(os.path.join(track.path, track.name), track.name.split('.')[-1])
         #np = self._read(au)
-        track.audio = Audio(au.raw_data, au.frame_width, au.frame_rate, au.frame_count(), au.channels)
+        track.audio = Audio(au.raw_data, au.frame_width, au.frame_rate, au.frame_count(), au.channels, len(au))
         track.max_status = track.audio.frame_count
         track.is_loaded = True
         self.tracks.append(track)

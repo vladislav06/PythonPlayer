@@ -41,7 +41,9 @@ def player(self, player_control: PlayerControl, playlist_notifier: Notifier[Play
     if track_status_notifier.value is not None and track_status_notifier.value.is_loaded is True:
         progress = player_control.get_progres() * 1000
         # print(progress)
-        length = track_notifier.value.audio.len_ms
+    if track_notifier.value is not None:
+        if track_notifier.value.is_loaded:
+            length = track_notifier.value.audio.len_ms
 
     def on_play_pause(e):
         player_control.play_pause()
@@ -91,7 +93,11 @@ def player(self, player_control: PlayerControl, playlist_notifier: Notifier[Play
                     on_click=on_forward):
                 Icon(name="forward", style=icon_style)
         with View(layout="row"):
-            Label("00:00")
+
+            seconds = int(((length*(progress/1000)) / 1000) % 60)
+            minutes = int(((length*(progress/1000)) / (1000 * 60)) % 60)
+
+            Label(f'{minutes:02d}:{seconds:02d}')
             Slider(value=progress,
                    min_value=0,
                    max_value=1000,
@@ -99,4 +105,8 @@ def player(self, player_control: PlayerControl, playlist_notifier: Notifier[Play
                    on_change=on_change,
                    on_click=on_click,
                    on_mouse_down=on_mouse_down)
-            Label(f'{int((length % 1000) / 6000):02d}:{int(length / 1000):02d}')
+
+            seconds = int((length / 1000) % 60)
+            minutes = int((length / (1000 * 60)) % 60)
+
+            Label(f'{minutes:02d}:{seconds:02d}')

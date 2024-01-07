@@ -13,12 +13,12 @@ class PlayerControl:
     """High abstraction class for controlling player, must be used by ui"""
     playlist_notifier: Notifier[Playlist]
     track_notifier: Notifier[Track]
+    track_manager: TrackManager
+    player: PlayerManager
+    # Very convoluted mess of flags and ifs to cover all edge cases
     track_status_notifier: Notifier[Track]
     track_full_status: TrackMessage
     next_track: Track
-
-    track_manager: TrackManager
-    player: PlayerManager
     is_playing: bool = False
 
     def __init__(self, player, song_manager, playlist_notifier, track_notifier, track_status_notifier):
@@ -36,31 +36,65 @@ class PlayerControl:
             self.player.play()
         self.is_playing = not self.is_playing
 
+    def play(self, track: Track):
+        """Will play specified track, assuming that playlist that this track belongs to is already selected"""
+        self.track_notifier.value = track
+
+        if not track.is_loaded:
+            self.track_manager.load(track)
+
+        status = self.player.get_full_status()
+        if status.current_track_exist:
+            if not self.is_playing:
+                self.player.set_current_track(track)
+            else:
+                self.player.set_next_track(track)
+                self.player.play_next()
+        else:
+            self.player.set_current_track(track)
+        self.next_track = track
+
+        if not self.is_playing:
+            self.player.play()
+            self.is_playing = True
+
     def forward(self, force=True):
         """Forwards to the next track in current playlist, if current track is last,
         will loop to playlist beginning"""
+        # search for next available track
         if self.track_notifier.value is None:
             next_index = 0
         else:
             next_index = self.track_notifier.value.index + 1
         if next_index >= len(self.playlist_notifier.value.tracks):
             next_index = 0
+        while not self.playlist_notifier.value.tracks[next_index].exist:
+            next_index += 1
+            if next_index >= len(self.playlist_notifier.value.tracks):
+                next_index = 0
 
+        # play music from start
         self.playlist_notifier.value.tracks[next_index].status = 0
+        # load
         if not self.playlist_notifier.value.tracks[next_index].is_loaded:
-            # load
             self.track_manager.load(self.playlist_notifier.value.tracks[next_index])
 
         status = self.player.get_full_status()
+
+        # play
         if status.current_track_exist:
-            print("current_track_exist")
+            # print("current_track_exist")
+            # if not self.is_playing:
+            #    self.player.set_current_track(self.playlist_notifier.value.tracks[next_index])
+            # else:
+            #    self.player.set_next_track(self.playlist_notifier.value.tracks[next_index])
             self.player.set_next_track(self.playlist_notifier.value.tracks[next_index])
             self.next_track = self.playlist_notifier.value.tracks[next_index]
             if force:
                 self.track_notifier.value = self.playlist_notifier.value.tracks[next_index]
                 self.player.play_next()
         else:
-            print("current_track_exist False")
+            # print("current_track_exist False")
             self.player.set_current_track(self.playlist_notifier.value.tracks[next_index])
             self.track_notifier.value = self.playlist_notifier.value.tracks[next_index]
             # self.player.play_next()
@@ -73,16 +107,26 @@ class PlayerControl:
 
         if progress < 0.05:
             # play prev track
+            # search for next available track
             next_index = self.track_notifier.value.index - 1
             if next_index < 0:
                 next_index = len(self.playlist_notifier.value.tracks) - 1
+            while not self.playlist_notifier.value.tracks[next_index].exist:
+                next_index -= 1
+                if next_index < 0:
+                    next_index = len(self.playlist_notifier.value.tracks) - 1
 
+            # play from start
             self.playlist_notifier.value.tracks[next_index].status = 0
+            # load
             if not self.playlist_notifier.value.tracks[next_index].is_loaded:
-                # load
                 self.track_manager.load(self.playlist_notifier.value.tracks[next_index])
-
+            # play
             if status.current_track_exist:
+                # if not self.is_playing:
+                #    self.player.set_current_track(self.playlist_notifier.value.tracks[next_index])
+                # else:
+                #    self.player.set_next_track(self.playlist_notifier.value.tracks[next_index])
                 self.player.set_next_track(self.playlist_notifier.value.tracks[next_index])
                 self.next_track = self.playlist_notifier.value.tracks[next_index]
                 self.track_notifier.value = self.playlist_notifier.value.tracks[next_index]
