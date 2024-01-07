@@ -65,14 +65,23 @@ class PlayerControl:
         """Forwards to the next track in current playlist, if current track is last,
         will loop to playlist beginning"""
         # search for next available track
+        if self.playlist_notifier.value is None:
+            return
+        if len(self.playlist_notifier.value.tracks)==0:
+            return
+
         if self.track_notifier.value is None:
             next_index = 0
         else:
             next_index = self.track_notifier.value.index + 1
         if next_index >= len(self.playlist_notifier.value.tracks):
             next_index = 0
+
         while not self.playlist_notifier.value.tracks[next_index].exist:
             next_index += 1
+            #no tracks to be played
+            if next_index == len(self.playlist_notifier.value.tracks):
+                return
             if next_index >= len(self.playlist_notifier.value.tracks):
                 next_index = 0
 
@@ -107,6 +116,8 @@ class PlayerControl:
         will loop to playlists first track """
         progress = self.get_progres()
         status = self.player.get_full_status()
+        if len(self.playlist_notifier.value.tracks)==0:
+            return
 
         if progress < 0.05:
             # play prev track
@@ -152,6 +163,8 @@ class PlayerControl:
 
     def change(self, new_status):
         # calculate new status from percentage
+        if self.track_notifier.value is None:
+            return
         self.track_notifier.value.status = int(new_status * self.track_notifier.value.max_status)
         self.player.set_next_track(self.track_notifier.value)
         self.next_track = self.track_notifier.value

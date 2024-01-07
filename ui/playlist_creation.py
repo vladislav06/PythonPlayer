@@ -43,7 +43,7 @@ def start(connection):
     global loop
     with app.start_loop() as lop:
         loop = lop
-        lop.add_signal_handler(signal.SIGINT, lop.stop)
+        #lop.add_signal_handler(signal.SIGINT, lop.stop)
         lop.run_forever()
 
 

@@ -79,17 +79,17 @@ def player(self, player_control: PlayerControl, playlist_notifier: Notifier[Play
         with View(layout="row"):
             with ButtonView(
                     layout="row",
-                    style={"background-color": "#32a852", "border-radius": 25, "max-width": 25},
+                    style= {"border-radius": 25, "max-width": 25},
                     on_click=on_backward):
                 Icon(name="backward", style=icon_style)
             with ButtonView(
                     layout="row",
-                    style={"background-color": "#32a852", "border-radius": 25, "max-width": 25},
+                    style={ "border-radius": 25, "max-width": 25},
                     on_click=on_play_pause):
-                Icon(name="play", style=icon_style)
+                Icon(name="pause" if player_control.is_playing else "play", style=icon_style)
             with ButtonView(
                     layout="row",
-                    style={"background-color": "#32a852", "border-radius": 25, "max-width": 25},
+                    style={ "border-radius": 25, "max-width": 25},
                     on_click=on_forward):
                 Icon(name="forward", style=icon_style)
         with View(layout="row"):

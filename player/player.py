@@ -136,6 +136,10 @@ class Player:
         self.playback = pyaudio.PyAudio()
 
     def _start_playback_stream(self):
+
+        if self.current_track is None:
+            return
+
         def _callback(in_data, frame_count, time_info, status):
             return self._playback_stream_callback(in_data, frame_count, time_info, status)
 

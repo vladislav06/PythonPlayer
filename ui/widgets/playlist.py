@@ -3,7 +3,7 @@ from edifice import App, component, View, Label, ButtonView, Icon, Button, use_s
 
 from playlists.playlist_manager import PlaylistManager
 
-# Styles
+#Styles
 text_regular_style = {"align": "left", "height": 25,
                       "padding": 25, "font-size": 20, "max-width": "200px"}
 text_chosen_style = {"align": "left", "font-style": "italic", "height": 25,
