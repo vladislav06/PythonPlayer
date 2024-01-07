@@ -1,12 +1,14 @@
 import os
 
-from player.track import Track
+import numpy as np
+
+from player.track import Track, Audio
 from pydub import AudioSegment, effects
 from pydub.silence import split_on_silence, detect_silence
 from pythonlangutil.overload import Overload, signature
 
 
-class SongManager:
+class TrackManager:
     tracks: list[Track] = []
 
     def load_from_folder(self, path: str):
@@ -50,11 +52,21 @@ class SongManager:
     @load.overload
     @signature("Track")
     def load(self, track: Track):
-        audio: AudioSegment = AudioSegment.from_file(os.path.join(track.path, track.name), track.name.split('.')[-1])
-        audio = self._process_audio(audio)
-        track.audio = audio
+        if not track.exist:
+            return
+        au: AudioSegment = AudioSegment.from_file(os.path.join(track.path, track.name), track.name.split('.')[-1])
+        #np = self._read(au)
+        track.audio = Audio(au.raw_data, au.frame_width, au.frame_rate, au.frame_count(), au.channels, len(au))
+        track.max_status = track.audio.frame_count
+        track.is_loaded = True
         self.tracks.append(track)
 
     @staticmethod
     def check_existence(track: Track) -> bool:
         return os.path.isfile(os.path.join(track.path, track.name))
+
+    def _read(self, a: AudioSegment, normalized=False):
+        """MP3 to numpy array"""
+        dtype = "uint8"
+        y = np.frombuffer(a.raw_data, dtype=dtype)
+        return y
