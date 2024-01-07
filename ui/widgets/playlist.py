@@ -9,7 +9,8 @@ text_regular_style = {"align": "left", "height": 25,
 text_chosen_style = {"align": "left", "font-style": "italic", "height": 25,
                      "padding": 25, "text-decoration": "underline", "font-size": 20, "max-width": "200px"}
 icon_style = {"width": 10, "padding": 10}
-button_style = {"width": 15, "height": 15, "margin": 10, "align": "right", "font-size": 8}
+button_style = {"width": 25, "height": 75, "margin": 10, "align": "right", "font-size": 8,
+                "border-top-right-radius": 15, "border-bottom-right-radius": 15}
 
 
 @component
@@ -43,7 +44,7 @@ def playlist(self, plst, playlist_notifier, playlist_manager: PlaylistManager):
             with View(layout="row"):
                 with ButtonView(
                         layout="row",
-                        style={"background-color": ""},
+                        style={"background-color": "", "border-top-left-radius": 15, "border-bottom-left-radius": 15},
                         on_click=on_click,
                 ):
                     Icon(name="music", style=icon_style)
