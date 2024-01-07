@@ -9,7 +9,7 @@ text_regular_style = {"align": "left", "height": 25,
 text_chosen_style = {"align": "left", "font-style": "italic", "height": 25,
                      "padding": 25, "text-decoration": "underline", "font-size": 20, "max-width": "200px"}
 icon_style = {"width": 10, "padding": 10}
-button_style = {"width": 25, "height": 75, "margin": 10, "align": "right", "font-size": 8,
+button_style = {"max-width": "50px", "height": 75, "margin": 10, "align": "right", "font-size": 8,
                 "border-top-right-radius": 15, "border-bottom-right-radius": 15}
 
 
@@ -52,5 +52,5 @@ def playlist(self, plst, playlist_notifier, playlist_manager: PlaylistManager):
 
                 Button(
                     title="X",
-                    style={"max-width": "50px"},
+                    style=button_style,
                     on_click=on_delete)
