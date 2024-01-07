@@ -1,4 +1,6 @@
 from multiprocessing import set_start_method
+
+from edifice import alert
 from pynput.keyboard import Listener, Key
 
 from player.player_controll import PlayerControl
@@ -36,7 +38,6 @@ def main():
     playlist_manager: PlaylistManager = PlaylistManager()
     playlists = playlist_manager.load_playlists()
 
-    # TODO: show notification to user about lost tracks
     n = []
     for playlist in playlists:
         m = []
@@ -51,19 +52,19 @@ def main():
     # song_manager.load(playlist_manager.playlists[0].tracks[0])
     # song_manager.load(playlist_manager.playlists[0].tracks[1])
 
-    song_manager.load(playlist_manager.playlists[0].tracks[0])
+    #song_manager.load(playlist_manager.playlists[0].tracks[0])
 
     player_manager = PlayerManager()
     player_manager.launch_player()
 
     # ui
     play_playlist_notifier = Notifier()
-    play_playlist_notifier.value = playlist_manager.playlists[0]
+    play_playlist_notifier.value = Playlist("",[])
     view_playlist_notifier = Notifier()
-    view_playlist_notifier.value = playlist_manager.playlists[0]
+    view_playlist_notifier.value = Playlist("",[])
     track_notifier = Notifier()
     track_status_notifier = Notifier()
-    track_notifier.value = song_manager.tracks[0]
+    #track_notifier.value = song_manager.tracks[0]
 
     player_control = PlayerControl(player_manager, song_manager, play_playlist_notifier, track_notifier,
                                    track_status_notifier)
@@ -83,6 +84,9 @@ def main():
               track_status_notifier,
               n)
 
+import logging
+logger = logging.getLogger("Edifice")
+logger.setLevel(logging.INFO)
 
 if __name__ == "__main__":
     try:

@@ -1,7 +1,5 @@
-import signal
+from edifice import App,  View, component, Window,  Button, use_async, use_state, alert
 
-from edifice import App, Label, View, component, Window, ScrollView, Button, use_async, use_state, alert
-import playlists as pls
 
 import ui.playlists as pl
 import ui.tracks as tk
@@ -9,20 +7,20 @@ from playlists.playlist import Playlist
 from playlists.playlist_manager import PlaylistManager
 from ui.player import player
 from ui.playlist_creation import dialogue
-from util.notifier import Notifier
-
 create_playlist = False
 
-
+n = None
 # Start the program as-is
 @component
 def MyApp(self, pl_manager: PlaylistManager, player_control, view_playlist_notifier, play_playlist_notifier,
-          track_notifier, track_status_notifier, n):
+          track_notifier, track_status_notifier):
     x, x_state = use_state(0)
     global create_playlist
+    global n
     # show warning about lost tracks
     if n is not None:
         alert(message="These tracks do not exist" + str(n))
+        n = None
 
     async def fetcher():
         name = await dialogue()
@@ -51,10 +49,11 @@ def MyApp(self, pl_manager: PlaylistManager, player_control, view_playlist_notif
 
 
 def launch(pl_manager: PlaylistManager, player_control, view_playlist_notifier, play_playlist_notifier, track_notifier,
-           track_status_notifier, n):
+           track_status_notifier, nn):
+    global n
+    n=nn
     app = App(MyApp(pl_manager, player_control, view_playlist_notifier, play_playlist_notifier, track_notifier,
-                    track_status_notifier, n))
-
+                    track_status_notifier))
     with app.start_loop() as loop:
-        loop.add_signal_handler(signal.SIGINT, loop.stop)
+        #loop.add_signal_handler(signal.SIGINT, loop.stop)
         loop.run_forever()
