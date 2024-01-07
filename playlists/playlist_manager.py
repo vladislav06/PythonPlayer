@@ -1,11 +1,26 @@
-import json
+from tinytag import TinyTag
 
+import json
 import jsonpickle
+import os
 
 from player.track import Track
 from playlists.playlist import Playlist
 from playlists.song_manager import TrackManager
 
+# At least on Windows, if a metadata field is empty, tinytag will always yield this string:
+tinytag_empty_data_string = '                              '
+# It's used here to check whether certain metadata exists or not.
+
+# Function to convert data from track_metadata.duration to minutes for display:
+def ConvertToMinutes(seconds):
+    # Convert to int
+    seconds = int(seconds)
+    # Figure out minutes
+    minutes = seconds // 60
+    # Figure out remaining seconds
+    seconds %= 60
+    return "%02d:%02d" % (minutes, seconds)
 
 class PlaylistManager:
     playlists: [Playlist] = []
@@ -32,7 +47,7 @@ class PlaylistManager:
             n += 1
         f.close()
 
-        # check if track exist
+        # check if track exists
         playlists: [Playlist] = []
         for playlist in self.playlists:
             pl: [Playlist] = Playlist(playlist.name, [])
@@ -42,7 +57,22 @@ class PlaylistManager:
                     pl.tracks.append(track)
                 else:
                     track.exist = True
-            if len(pl.tracks) != 0:
+                    # Search for metadata
+                    track_metadata = TinyTag.get(os.path.join(track.path, track.name))
+                    # Save track name, display file name if title is empty in metadata
+                    if track_metadata.title != tinytag_empty_data_string:
+                        track.title = track_metadata.title
+                    else:
+                        track.title = track.name
+                    # Show artist name, display - if artist is empty in metadata
+                    if track_metadata.artist != tinytag_empty_data_string:
+                        track.title = track_metadata.artist
+                    else:
+                        track.artist = '-'
+                    # Get duration, convert to minutes and save as string
+                    track.duration = ConvertToMinutes(track_metadata.duration)
+
+        if len(pl.tracks) != 0:
                 playlists.append(pl)
 
         return playlists

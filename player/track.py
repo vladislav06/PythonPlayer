@@ -54,6 +54,10 @@ class Track(Serializable):
     audio: Audio | None = None
     index: int = 0
     exist: bool = False
+    # Metadata
+    title: str = ""
+    artist: str = ""
+    duration: str = ""
 
     def __init__(self, name: str, path: str, audio: Audio | None = None):
         self.name = name
