@@ -8,3 +8,4 @@ pythonlangutil
 typing-extensions
 PySide6
 tinytag
+pynput

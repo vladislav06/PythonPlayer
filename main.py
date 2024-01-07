@@ -1,4 +1,5 @@
 from multiprocessing import set_start_method
+from pynput.keyboard import Listener
 
 from player.player_controll import PlayerControl
 from player.player_interface import *
@@ -8,6 +9,19 @@ from playlists.playlist_manager import PlaylistManager
 from playlists.song_manager import TrackManager
 from ui import ui
 from util.notifier import Notifier
+
+
+# Function for handling key presses
+def on_press(key):
+    # play pause media key was pressed
+    if str(key) == '<179>':
+        PlayerControl.play_pause()
+    # next key was pressed
+    if str(key) == '<176>':
+        PlayerControl.forward()
+    # previous key was pressed
+    if str(key) == '<177>':
+        PlayerControl.backward()
 
 
 def main():
@@ -24,7 +38,7 @@ def main():
         n.append(playlist.name + ":" + str(m))
 
     print("these tracks dont exist:", n)
-    ###
+    ###A
     # load songs from 1st playlist
     song_manager = TrackManager()
     # song_manager.load(playlist_manager.playlists[0].tracks[0])
@@ -35,6 +49,9 @@ def main():
 
     player_manager = PlayerManager()
     player_manager.launch_player()
+    # button listener
+    listener_thread = Listener(on_press=on_press, on_release=None)
+    listener_thread.start()
     # ui
     play_playlist_notifier = Notifier()
     play_playlist_notifier.value = playlist_manager.playlists[0]
