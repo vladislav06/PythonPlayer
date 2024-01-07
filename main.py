@@ -1,4 +1,4 @@
-from multiprocessing import set_start_method
+from multiprocessing import set_start_method, Pipe
 
 from edifice import alert
 from pynput.keyboard import Listener, Key
@@ -14,19 +14,7 @@ from util.notifier import Notifier
 
 
 # Function for handling key presses
-def on_press(key, player_control):
-    # play pause media key was pressed
-    if key == Key.media_play_pause:
-        pass
-        # player_control.play_pause()
-    # next key was pressed
-    if key == Key.media_next:
-        pass
-        # player_control.forward()
-    # previous key was pressed
-    if key == Key.media_previous:
-        pass
-        # player_control.backward()
+
 
 
 player_control = None
@@ -34,6 +22,7 @@ player_control = None
 
 def main():
     global player_control
+
     # load playlists
     playlist_manager: PlaylistManager = PlaylistManager()
     playlists = playlist_manager.load_playlists()
@@ -65,12 +54,15 @@ def main():
     track_notifier = Notifier()
     track_status_notifier = Notifier()
     #track_notifier.value = song_manager.tracks[0]
+    pair: (Connection, Connection) = Pipe()
 
     player_control = PlayerControl(player_manager, song_manager, play_playlist_notifier, track_notifier,
-                                   track_status_notifier)
+                                   track_status_notifier, pair[1])
+
+
 
     def on_prs(key):
-        on_press(key, player_control)
+        pair[0].send(key)
 
     # button listener
     listener_thread = Listener(on_press=on_prs, on_release=None)

@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLabel
-from edifice import App, component, View, Label, ButtonView, Icon, Button, use_state
+from edifice import App, component, View, Label, ButtonView, Icon, Button, use_state, alert
 
 from playlists.playlist_manager import PlaylistManager
 
@@ -25,12 +25,15 @@ def playlist(self, plst, playlist_notifier, playlist_manager: PlaylistManager):
             pass
 
     def on_click(e):
-        print("click on selected_playlist:", plst.name)
         playlist_notifier.value = plst
 
     playlist_notifier.attach(on_change)
 
     def on_delete(e):
+        # ask user
+        answer = alert(message="Are you sure?", choices=["Yes", "No"])
+        if answer ==1:
+            return
         playlist_manager.playlists.remove(plst)
         playlist_notifier.detach(on_change)
         playlist_notifier.value = None
@@ -39,7 +42,7 @@ def playlist(self, plst, playlist_notifier, playlist_manager: PlaylistManager):
 
     # Set background
     with View(style={"margin": 10}):
-        with View(style={"border": "1px solid black"}):
+        with View(style={"border": "2px solid black"} if selected else {"border": "1px solid black"}):
             # Set button and mark the chosen playlist
             with View(layout="row"):
                 with ButtonView(

@@ -16,9 +16,7 @@ class Playlist(object):
             n += 1
 
     def add(self, track: Track):
-        track.index = len(self.tracks) - 1
-        if track.index < 0:
-            track.index = 0
+        track.index = len(self.tracks)
         self.tracks.append(track)
 
     def to_json(self):

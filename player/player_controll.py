@@ -1,4 +1,8 @@
 import asyncio
+from multiprocessing.connection import Connection
+
+from pynput.keyboard import Key
+
 
 from player.player_interface import TrackMessage
 from player.player_manager import PlayerManager
@@ -7,7 +11,6 @@ from playlists.playlist import Playlist
 from playlists.track_manager import TrackManager
 from util.notifier import Notifier
 from util.pereodic import Periodic
-
 
 class PlayerControl:
     """High abstraction class for controlling player, must be used by ui"""
@@ -20,13 +23,15 @@ class PlayerControl:
     track_full_status: TrackMessage
     next_track: Track
     is_playing: bool = False
+    pipe:Connection = None
 
-    def __init__(self, player, song_manager, playlist_notifier, track_notifier, track_status_notifier):
+    def __init__(self, player, song_manager, playlist_notifier, track_notifier, track_status_notifier, pipe):
         self.player = player
         self.track_manager = song_manager
         self.playlist_notifier = playlist_notifier
         self.track_notifier = track_notifier
         self.track_status_notifier = track_status_notifier
+        self.pipe = pipe
 
     def stop(self):
         self.player.proc.kill()
@@ -196,5 +201,17 @@ class PlayerControl:
         # add next track
         if not self.track_full_status.next_track_exist:
             self.forward(force=False)
+
+        if self.pipe.poll():
+            key = self.pipe.recv()
+            # play pause media key was pressed
+            if key == Key.media_play_pause:
+                self.play_pause()
+            # next key was pressed
+            if key == Key.media_next:
+                self.forward()
+            # previous key was pressed
+            if key == Key.media_previous:
+                self.backward()
 
         await asyncio.sleep(0.5)

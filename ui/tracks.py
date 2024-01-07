@@ -27,18 +27,23 @@ def ShowTracks(self,
         x_setter(0)
 
     def add_track(e):
+        if view_playlist_notifier.value is None:
+            return
         path = file_dialog(
             caption="Select track",
             file_filter="*.mp3 *.wav *.flac")
+        if path is None:
+            return
 
         track = Track(path.split(os.sep)[-1], str(pathlib.Path(path).parent.resolve()))
         track.exist = True
         TrackManager.load_metadata(track)
+
+
         view_playlist_notifier.value.add(track)
         view_playlist_notifier.value = view_playlist_notifier.value
         playlist_manager.save_playlists()
         x_setter(0)
-        pass
 
     view_playlist_notifier.attach(on_change)
     with View(style={

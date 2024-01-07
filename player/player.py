@@ -161,7 +161,7 @@ class Player:
 
     def play(self):
         """ Will start playing current track """
-        print("play")
+        #print("play")
         if self.playback_status == self.PlaybackStatus.PAUSE:
             self.playback_status = self.PlaybackStatus.PLAY
             self.playback_current_frame_count = self.playback_pause_frame_count
@@ -176,25 +176,25 @@ class Player:
 
     def pause(self):
         """ Will pause current track """
-        print("pause")
+        #print("pause")
         self.playback_status = self.PlaybackStatus.PAUSE
         self.playback_pause_frame_count = self.playback_current_frame_count
 
     def set_current(self, track: Track):
         """" Will set current track to play """
-        print("set_current:", track.name)
+        #print("set_current:", track.name)
         self.current_track = track
 
     def set_next(self, track: Track):
         """" Will set next track to play """
-        print("set_next:", track.name)
+        #print("set_next:", track.name)
         self.next_track = track
         self.playback_next_frame_count = track.status
-        print("playback_next_frame_count: ", self.playback_next_frame_count)
+        #print("playback_next_frame_count: ", self.playback_next_frame_count)
 
     def play_next(self):
         """Force fade to the next track"""
-        print("play_next")
+        #print("play_next")
         self.play_next_track = True
         if 0.9 > self.playback_fade > 0.1:
             pass

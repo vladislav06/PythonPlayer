@@ -106,5 +106,3 @@ def launch_player(pip: Connection):
     pipe = pip
     t = Thread(target=loop, args=[pipe, player])
     t.start()
-
-    print("ended!")
