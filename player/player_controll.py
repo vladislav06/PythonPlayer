@@ -4,7 +4,7 @@ from player.player_interface import TrackMessage
 from player.player_manager import PlayerManager
 from player.track import Track
 from playlists.playlist import Playlist
-from playlists.song_manager import TrackManager
+from playlists.track_manager import TrackManager
 from util.notifier import Notifier
 from util.pereodic import Periodic
 
@@ -27,6 +27,9 @@ class PlayerControl:
         self.playlist_notifier = playlist_notifier
         self.track_notifier = track_notifier
         self.track_status_notifier = track_status_notifier
+
+    def stop(self):
+        self.player.proc.kill()
 
     def play_pause(self):
         """Play/pause"""

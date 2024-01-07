@@ -3,6 +3,7 @@ from tinytag import TinyTag
 
 from player.player_controll import PlayerControl
 from playlists.playlist import Playlist
+from playlists.playlist_manager import PlaylistManager
 from util.notifier import Notifier
 
 # Styles
@@ -10,12 +11,14 @@ track_style = {"height": 25, "margin": 10, "padding": 25,
                "border": "1px solid black"}
 button_style = {"height": 15, "width": 15, "font-size": 8}
 
+
 @component
 def ShowTrack(self,
               track,
               view_playlist_notifier: Notifier[Playlist],
               play_playlist_notifier: Notifier[Playlist],
-              player_control: PlayerControl):
+              player_control: PlayerControl,
+              playlist_manager: PlaylistManager):
     def click(e):
         if track.exist:
             # switch to view playlist
@@ -29,6 +32,8 @@ def ShowTrack(self,
         track.index -= 1
         playlist.tracks[track.index] = track
         playlist.tracks[track.index + 1] = tmp
+        # save
+        playlist_manager.save_playlists()
         # update
         view_playlist_notifier.value = view_playlist_notifier.value
 
@@ -39,6 +44,8 @@ def ShowTrack(self,
         track.index += 1
         playlist.tracks[track.index] = track
         playlist.tracks[track.index - 1] = tmp
+        # save
+        playlist_manager.save_playlists()
         # update
         view_playlist_notifier.value = view_playlist_notifier.value
 
@@ -50,11 +57,15 @@ def ShowTrack(self,
         # Display for title-artist
         with View(layout="column", style={"align": "left"}):
             Label(track.title)
-            Label(track.artist)
-        # Display for buttons (move up or down)
-        with View(layout="column", style={"align": "right"}):
-            Button('▲', style=button_style, on_click=move_up, enabled=track.index != 0)
-            Button('▼', style=button_style, on_click=move_down, enabled=track.index != len(view_playlist_notifier.value.tracks)-1)
+            if track.artist is not None:
+                Label(track.artist)
+
         # Display for length
         with View(style={"align": "right"}):
             Label(track.duration)
+
+        # Display for buttons (move up or down)
+        with View(layout="column", style={"align": "right"}):
+            Button('▲', style=button_style, on_click=move_up, enabled=track.index != 0)
+            Button('▼', style=button_style, on_click=move_down,
+                   enabled=track.index != len(view_playlist_notifier.value.tracks) - 1)

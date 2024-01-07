@@ -1,30 +1,37 @@
 from multiprocessing import set_start_method
-from pynput.keyboard import Listener
+from pynput.keyboard import Listener, Key
 
 from player.player_controll import PlayerControl
 from player.player_interface import *
 from playlists.playlist import Playlist
 from player.player_manager import PlayerManager
 from playlists.playlist_manager import PlaylistManager
-from playlists.song_manager import TrackManager
+from playlists.track_manager import TrackManager
 from ui import ui
 from util.notifier import Notifier
 
 
 # Function for handling key presses
-def on_press(key):
+def on_press(key, player_control):
     # play pause media key was pressed
-    if str(key) == '<179>':
-        PlayerControl.play_pause()
+    if key == Key.media_play_pause:
+        pass
+        # player_control.play_pause()
     # next key was pressed
-    if str(key) == '<176>':
-        PlayerControl.forward()
+    if key == Key.media_next:
+        pass
+        # player_control.forward()
     # previous key was pressed
-    if str(key) == '<177>':
-        PlayerControl.backward()
+    if key == Key.media_previous:
+        pass
+        # player_control.backward()
+
+
+player_control = None
 
 
 def main():
+    global player_control
     # load playlists
     playlist_manager: PlaylistManager = PlaylistManager()
     playlists = playlist_manager.load_playlists()
@@ -37,21 +44,18 @@ def main():
             m.append(str(track))
         n.append(playlist.name + ":" + str(m))
 
-    print("these tracks dont exist:", n)
-    ###A
+    if len(n) == 0:
+        n = None
     # load songs from 1st playlist
     song_manager = TrackManager()
     # song_manager.load(playlist_manager.playlists[0].tracks[0])
     # song_manager.load(playlist_manager.playlists[0].tracks[1])
 
-    for track in playlist_manager.playlists[0].tracks:
-        song_manager.load(track)
+    song_manager.load(playlist_manager.playlists[0].tracks[0])
 
     player_manager = PlayerManager()
     player_manager.launch_player()
-    # button listener
-    listener_thread = Listener(on_press=on_press, on_release=None)
-    listener_thread.start()
+
     # ui
     play_playlist_notifier = Notifier()
     play_playlist_notifier.value = playlist_manager.playlists[0]
@@ -61,11 +65,23 @@ def main():
     track_status_notifier = Notifier()
     track_notifier.value = song_manager.tracks[0]
 
-    player_control: PlayerControl = PlayerControl(player_manager, song_manager, play_playlist_notifier, track_notifier,
-                                                  track_status_notifier)
+    player_control = PlayerControl(player_manager, song_manager, play_playlist_notifier, track_notifier,
+                                   track_status_notifier)
 
-    ui.launch(playlist_manager, player_control, view_playlist_notifier, play_playlist_notifier, track_notifier,
-              track_status_notifier)
+    def on_prs(key):
+        on_press(key, player_control)
+
+    # button listener
+    listener_thread = Listener(on_press=on_prs, on_release=None)
+    listener_thread.start()
+
+    ui.launch(playlist_manager,
+              player_control,
+              view_playlist_notifier,
+              play_playlist_notifier,
+              track_notifier,
+              track_status_notifier,
+              n)
 
 
 if __name__ == "__main__":
@@ -74,4 +90,4 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt as inter:
         pass
-
+    player_control.stop()

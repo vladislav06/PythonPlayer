@@ -10,6 +10,7 @@ class PlayerManager:
     connection: Connection
     current_status: int = 0
     next_status: int = 0
+    proc = None
 
     def launch_player(self):
         pair: (Connection, Connection) = Pipe()

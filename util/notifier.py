@@ -32,6 +32,7 @@ class Notifier(Generic[T]):
         try:
             self._observers.remove(observer)
         except ValueError:
+            print("error removing")
             pass
 
     @property

@@ -1,11 +1,15 @@
 import os
 
 import numpy as np
+from tinytag import TinyTag
 
 from player.track import Track, Audio
 from pydub import AudioSegment, effects
 from pydub.silence import split_on_silence, detect_silence
 from pythonlangutil.overload import Overload, signature
+
+# At least on Windows, if a metadata field is empty, tinytag will always yield this string:
+tinytag_empty_data_string = ''
 
 
 class TrackManager:
@@ -55,7 +59,7 @@ class TrackManager:
         if not track.exist:
             return
         au: AudioSegment = AudioSegment.from_file(os.path.join(track.path, track.name), track.name.split('.')[-1])
-        #np = self._read(au)
+        # np = self._read(au)
         track.audio = Audio(au.raw_data, au.frame_width, au.frame_rate, au.frame_count(), au.channels, len(au))
         track.max_status = track.audio.frame_count
         track.is_loaded = True
@@ -70,3 +74,30 @@ class TrackManager:
         dtype = "uint8"
         y = np.frombuffer(a.raw_data, dtype=dtype)
         return y
+
+    @staticmethod
+    def ConvertToMinutes(secs):
+        # Convert to int
+        seconds = int(secs)
+        # Figure out minutes
+        minutes = seconds // 60
+        # Figure out remaining seconds
+        seconds %= 60
+        return "%02d:%02d" % (minutes, seconds)
+
+    @staticmethod
+    def load_metadata(track):
+        # Search for metadata
+        track_metadata = TinyTag.get(os.path.join(track.path, track.name))
+        # Save track name, display file name if title is empty in metadata
+        if track_metadata.title != tinytag_empty_data_string and track_metadata.artist  is not None:
+            track.title = track_metadata.title
+        else:
+            track.title = track.name
+        # Show artist name, display - if artist is empty in metadata
+        if track_metadata.artist != tinytag_empty_data_string and track_metadata.artist is not None:
+            track.artist = track_metadata.artist
+        else:
+            track.artist = None
+        # Get duration, convert to minutes and save as string
+        track.duration = TrackManager.ConvertToMinutes(track_metadata.duration)

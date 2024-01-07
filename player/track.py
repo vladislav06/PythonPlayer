@@ -63,6 +63,7 @@ class Track(Serializable):
         self.name = name
         self.path = path
         self.audio = audio
+        self.title =name
 
     def copy(self):
         """ Will return copy of this track, but without audio data"""
