@@ -23,23 +23,20 @@ def MyApp(self, pl_manager: PlaylistManager, player_control, view_playlist_notif
         n = None
 
     async def fetcher():
-        print("3")
         name = await dialogue()
-        pl_manager.add(Playlist(name, []))
+        playlist = Playlist(name, [])
+        pl_manager.add(playlist)
         pl_manager.save_playlists()
-        view_playlist_notifier.value = view_playlist_notifier.value
+        view_playlist_notifier.value = playlist
         x_state(x+1)
 
     def new_playlist(e):
-        print("1")
         global create_playlist
         create_playlist = True
         x_state(x+1)
 
     if create_playlist:
-        print("2")
         use_async(fetcher, x)
-        print("2.1")
         create_playlist = False
 
     with Window(title='PythonPlayer'):  # Top of every App must be a Window
