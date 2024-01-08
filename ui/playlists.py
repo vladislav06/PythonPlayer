@@ -4,10 +4,6 @@ from edifice import component, View, Label, ScrollView, Button, use_state
 from playlists.playlist_manager import PlaylistManager
 from ui.widgets import playlist as plWidget
 
-
-# testPlaylists = ["1", "12", "2", "3", "4"]
-
-
 @component
 def Playlists(self, playlists: [Playlist], playlist_notifier,playlist_manager:PlaylistManager):
     x, x_setter = use_state(0)

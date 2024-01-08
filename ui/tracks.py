@@ -12,9 +12,6 @@ from playlists.playlist import Playlist
 from util.notifier import Notifier
 
 
-# testTracks = ["1", "12", "2", "3", "4"]
-
-
 @component
 def ShowTracks(self,
                playlist_manager: PlaylistManager,
@@ -38,7 +35,6 @@ def ShowTracks(self,
         track = Track(path.split(os.sep)[-1], str(pathlib.Path(path).parent.resolve()))
         track.exist = True
         TrackManager.load_metadata(track)
-
 
         view_playlist_notifier.value.add(track)
         view_playlist_notifier.value = view_playlist_notifier.value

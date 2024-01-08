@@ -1,5 +1,4 @@
 from edifice import component, View, Label, Button, use_state
-from tinytag import TinyTag
 
 from player.player_controll import PlayerControl
 from playlists.playlist import Playlist
@@ -70,7 +69,9 @@ def ShowTrack(self,
         style = [track_style, {"background-color": "rgba(10,10,10,100)"}]
 
 
-    with View(layout="row", style=[style,{"border": "2px solid black"} if player_control.track_notifier.value == track else {}], on_click=click, cursor="move"):
+    with View(layout="row",
+              style=[style,{"border": "2px solid black"} if player_control.track_notifier.value == track else {}],
+              on_click=click, cursor="move"):
         # Display for title-artist
         with View(layout="column", style={"align": "left"}):
             Label(track.title)

@@ -31,6 +31,11 @@ class PlaylistManager:
     def load_playlists(self) -> [Playlist]:
         """ Will load playlists from a file and will check if tracks exist.
         Will return list of Playlists with tracks that don't exist"""
+        # if playlists.json doesn't exist, make one
+        if not os.path.isfile(self.FILE_NAME):
+            empty_json = json.dumps([])
+            with open(self.FILE_NAME, "w") as outfile:
+                outfile.write(empty_json)
         f = open(self.FILE_NAME, "r")
         jsn = json.load(f)
         self.playlists = list(map(lambda x: Playlist.from_json(x), jsn))
