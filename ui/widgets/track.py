@@ -1,4 +1,4 @@
-from edifice import component, View, Label, Button, use_state
+from edifice import component, View, Label, Button, use_state, alert
 
 from player.player_controll import PlayerControl
 from playlists.playlist import Playlist
@@ -8,7 +8,7 @@ from util.notifier import Notifier
 # Styles
 track_style = {"height": 25, "margin": 10, "padding": 25,
                "border": "1px solid black"}
-button_style = {"height": 30, "width": 15, "font-size": 8}
+button_style = {"height": 30, "width": 14, "font-size": 8}
 
 
 @component
@@ -59,6 +59,10 @@ def ShowTrack(self,
         view_playlist_notifier.value = view_playlist_notifier.value
 
     def delete(e):
+        # ask user
+        answer = alert(message="Are you sure?", choices=["Yes", "No"])
+        if answer == 1:
+            return
         view_playlist_notifier.value.tracks.remove(track)
         playlist_manager.save_playlists()
         view_playlist_notifier.value = view_playlist_notifier.value
